@@ -31,8 +31,6 @@ export type HandleToolUseResult = {
 export function handleToolUseBlock(
   block: BetaToolUseBlock,
   parentToolUseId: string | undefined,
-  threadId: string,
-  runId: string,
   currentState: unknown,
   subscriber: Subscriber<ProcessedEvent>,
 ): HandleToolUseResult {
@@ -81,8 +79,6 @@ export function handleToolUseBlock(
   // Regular tool handling for non-state tools
   subscriber.next({
     type: EventType.TOOL_CALL_START,
-    threadId,
-    runId,
     toolCallId: toolId,
     toolCallName: toolDisplayName, // Use unprefixed name
     parentMessageId: parentToolUseId,
@@ -91,8 +87,6 @@ export function handleToolUseBlock(
   if (toolInput && Object.keys(toolInput).length > 0) {
     subscriber.next({
       type: EventType.TOOL_CALL_ARGS,
-      threadId,
-      runId,
       toolCallId: toolId,
       delta: JSON.stringify(toolInput),
     });
@@ -104,8 +98,6 @@ export function handleToolUseBlock(
   // is the only place that closes the tool call.
   subscriber.next({
     type: EventType.TOOL_CALL_END,
-    threadId,
-    runId,
     toolCallId: toolId,
   });
 

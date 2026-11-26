@@ -931,8 +931,6 @@ export class ClaudeAgentAdapter extends AbstractAgent {
                 if (!hasStreamedText) {
                   subscriber.next({
                     type: EventType.TEXT_MESSAGE_START,
-                    threadId,
-                    runId,
                     messageId: currentMessageId,
                     role: "assistant",
                   });
@@ -942,8 +940,6 @@ export class ClaudeAgentAdapter extends AbstractAgent {
 
                 subscriber.next({
                   type: EventType.TEXT_MESSAGE_CONTENT,
-                  threadId,
-                  runId,
                   messageId: currentMessageId,
                   delta: text,
                 });
@@ -968,8 +964,6 @@ export class ClaudeAgentAdapter extends AbstractAgent {
                 accumulatedToolJson += partialJson;
                 subscriber.next({
                   type: EventType.TOOL_CALL_ARGS,
-                  threadId,
-                  runId,
                   toolCallId: currentToolCallId,
                   delta: partialJson,
                 });
@@ -1002,8 +996,6 @@ export class ClaudeAgentAdapter extends AbstractAgent {
 
                 subscriber.next({
                   type: EventType.TOOL_CALL_START,
-                  threadId,
-                  runId,
                   toolCallId: currentToolCallId,
                   toolCallName: currentToolDisplayName, // Use unprefixed name for frontend matching!
                   parentMessageId: currentMessageId ?? undefined, // Link to parent message
@@ -1093,8 +1085,6 @@ export class ClaudeAgentAdapter extends AbstractAgent {
               // a subsequent message (ToolResultBlock in Python, SDKUserMessage in TS).
               subscriber.next({
                 type: EventType.TOOL_CALL_END,
-                threadId,
-                runId,
                 toolCallId: currentToolCallId,
               });
 
@@ -1109,8 +1099,6 @@ export class ClaudeAgentAdapter extends AbstractAgent {
             if (currentMessageId && hasStreamedText) {
               subscriber.next({
                 type: EventType.TEXT_MESSAGE_END,
-                threadId,
-                runId,
                 messageId: currentMessageId,
               });
             }
@@ -1178,8 +1166,6 @@ export class ClaudeAgentAdapter extends AbstractAgent {
             const { updatedState } = handleToolUseBlock(
               toolBlock,
               msgId,
-              threadId,
-              runId,
               runCtx.currentState,
               subscriber,
             );
@@ -1212,8 +1198,6 @@ export class ClaudeAgentAdapter extends AbstractAgent {
 
                 subscriber.next({
                   type: EventType.TOOL_CALL_RESULT,
-                  threadId,
-                  runId,
                   // The native echo updates the submitted result, rather than
                   // introducing a second outward message for the same call.
                   messageId:
@@ -1297,22 +1281,16 @@ export class ClaudeAgentAdapter extends AbstractAgent {
             const resultMsgId = matchingAssistant?.id ?? randomUUID();
             subscriber.next({
               type: EventType.TEXT_MESSAGE_START,
-              threadId,
-              runId,
               messageId: resultMsgId,
               role: "assistant",
             });
             subscriber.next({
               type: EventType.TEXT_MESSAGE_CONTENT,
-              threadId,
-              runId,
               messageId: resultMsgId,
               delta: resultText,
             });
             subscriber.next({
               type: EventType.TEXT_MESSAGE_END,
-              threadId,
-              runId,
               messageId: resultMsgId,
             });
 
@@ -1336,8 +1314,6 @@ export class ClaudeAgentAdapter extends AbstractAgent {
         );
         subscriber.next({
           type: EventType.TOOL_CALL_END,
-          threadId,
-          runId,
           toolCallId: currentToolCallId,
         });
         currentToolCallId = null;
@@ -1365,8 +1341,6 @@ export class ClaudeAgentAdapter extends AbstractAgent {
         );
         subscriber.next({
           type: EventType.TEXT_MESSAGE_END,
-          threadId,
-          runId,
           messageId: currentMessageId,
         });
       }

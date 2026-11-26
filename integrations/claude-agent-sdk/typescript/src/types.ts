@@ -67,19 +67,11 @@ export type ClaudeAgentAdapterConfig = AgentConfig &
   };
 
 /**
- * The extra attribution this adapter rides on every event. Not protocol
- * fields: the tolerant validators keep unknown keys, and the strip-and-warn
- * enforcement stage owns dropping them — declared here so the decoration is a
- * type, not a cast.
- *
- * "Owns dropping them" is not free, but not on every event either. Enforcement
- * validates each event against its own schema in `EVENT_SCHEMA_BY_TYPE`, and
- * `RunStartedEventSchema` and `RunFinishedEventSchema` both DECLARE `threadId`
- * and `runId` as required — so on those events the attribution is recognised
- * and kept. It is only on an event whose schema does not declare them —
- * `RUN_ERROR` chief among the ones this adapter emits — that `threadId` and
- * `runId` are unrecognised material a consumer running enforcement strips,
- * warning once per stripped path, per such event.
+ * The `threadId`/`runId` attribution this adapter puts on its RUN_* lifecycle
+ * events. `RunStartedEventSchema` and `RunFinishedEventSchema` declare both
+ * fields; `RUN_ERROR` does not, so a consumer running enforcement strips them
+ * there, warning once per stripped path. Text, tool-call and other events do
+ * not carry them, since on those every event would be stripped and warned.
  */
 type AdapterAttribution = {
   threadId?: string;
